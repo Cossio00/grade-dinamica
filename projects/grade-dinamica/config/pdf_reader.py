@@ -3,50 +3,37 @@ from PyPDF2 import PdfReader
 
 
 class Disciplina:
-    def __init__(self, ano_sem, codigo_disciplina, chs, media, faltas, situacao):
-        self.ano_sem = ano_sem        
+    def __init__(self, codigo_disciplina, chs, situacao, tipo): 
         self.codigo_disciplina = codigo_disciplina
         self.chs = chs
-        self.media = media
-        self.faltas = faltas
         self.situacao = situacao
-        
-    def setAnoSem(self, ano_sem):
-        self.ano_sem = ano_sem
-        
+        self.tipo = tipo        #tipo indica: 0 para obrigatoria, 1 para eletiva e 2 para facultativa
+                
     def setCodigoDisciplina(self, codigo_disciplina):
         self.codigo_disciplina = codigo_disciplina
                 
     def setChs(self, chs):
         self.chs = chs
-
-    def setMedia(self, media):
-        self.media = media
-
-    def setFaltas(self, faltas):
-        self.faltas = faltas
     
     def setSituacao(self, situacao):
         self.situacao = situacao
 
-    def getAnoSem(self):
-        return self.ano_sem
+    def setTipo(self, tipo):
+        self.tipo = tipo
     
     def getCodigoDisciplina(self):
         return self.codigo_disciplina
     
     def getChs(self):
         return self.chs
-    
-    def getMedia(self):
-        return self.media
-
-    def getFaltas(self):
-        return self.faltas
-                
+                    
     def getSituacao(self):
         return self.situacao
-        
+
+    def getTipo(self):
+        return self.tipo
+
+
 with pdfplumber.open("../../../../HISTORICO_ESCOLAR__GRADUACAO1914004.pdf") as pdf:
     disciplinas = []
     for page_number, page in enumerate(pdf.pages):
@@ -56,7 +43,17 @@ with pdfplumber.open("../../../../HISTORICO_ESCOLAR__GRADUACAO1914004.pdf") as p
         for table in tables:
             for row in table:
                 if row[-1] == 'AP':
-                    disciplina = Disciplina(row[0], row[1], row[2], row[3], row[4], row[-1])
+                    #print(row)
+                    if(len(row) > 10):
+                        disciplina = Disciplina(row[1], row[7], row[-1], 0)
+                    else:
+                        disciplina = Disciplina(row[1], row[2], row[-1], 0)
                     disciplinas.append(disciplina)
                     
-            
+        
+    for disciplina in disciplinas:
+        if "(E)" in disciplina.getCodigoDisciplina():
+            disciplina.setTipo(1)
+        if "(F)" in disciplina.getCodigoDisciplina():
+            disciplina.setTipo(2)
+        print(disciplina.getCodigoDisciplina(), disciplina.getTipo())
