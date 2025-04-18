@@ -445,6 +445,39 @@ p.justify {
     hyphens: auto;
 }
 
+.pdf-reader{
+    position: fixed;
+    bottom: 100px;
+    right: 100px;
+}
+
+.pdf-reader input[type="file"] {
+    display: none;
+}
+
+.pdf-reader label {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: rgb(244, 204, 184);
+    color: black;
+    border: none;
+    border-radius: 10px;
+    width: 180px;
+    height: 110px;
+    font-size: 18px;
+    font-family: 'Source Sans 3', sans-serif;
+    text-align: center;
+    cursor: pointer;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
+    padding: 5px;
+    text-wrap: wrap;
+    transition: background-color 0.3s ease;
+}
+
+.pdf-reader label:hover {
+    background-color: #0056b3;
+}
 /** Acessibility adjustments (media queries) **/
 
 @media only screen and (prefers-reduced-motion: no-preference){

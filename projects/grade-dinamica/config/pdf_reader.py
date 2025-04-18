@@ -33,8 +33,10 @@ class Disciplina:
     def getTipo(self):
         return self.tipo
 
-
-with pdfplumber.open("../../../../HISTORICO_ESCOLAR__GRADUACAO1914004.pdf") as pdf:
+#HISTORICO_ESCOLAR__GRADUACAO2021128
+#HISTORICO_ESCOLAR__GRADUACAO1914004
+#HISTORICO_ESCOLAR__GRADUACAO1624348
+with pdfplumber.open("../../../../HISTORICO_ESCOLAR__GRADUACAO1624348.pdf") as pdf:
     disciplinas = []
     for page_number, page in enumerate(pdf.pages):
 
@@ -56,4 +58,6 @@ with pdfplumber.open("../../../../HISTORICO_ESCOLAR__GRADUACAO1914004.pdf") as p
             disciplina.setTipo(1)
         if "(F)" in disciplina.getCodigoDisciplina():
             disciplina.setTipo(2)
+
+    for disciplina in disciplinas:
         print(disciplina.getCodigoDisciplina(), disciplina.getTipo())

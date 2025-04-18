@@ -118,6 +118,64 @@ const createGrid = _ => {
 
 }
 
+document.getElementById("fileInput").addEventListener("change", function () {
+    const file = this.files[0];
+    if (!file) return;
+
+    const formData = new FormData();
+    formData.append("file", file);
+
+    fetch("http://localhost:5000/upload", {
+        method: "POST",
+        body: formData
+    })
+    .then((res) => res.json())
+    .then((data) => {
+        console.log("Disciplinas extraídas:");
+        
+        
+        data.forEach((disciplina, index) => {
+            const courseData = courses.find(c => disciplina.codigo == c.id);    //Encontra o curso do arquivo interno a partir do historico
+            if(courseData != undefined){
+                if (!courseData.isCompleted) {
+                const isRequirementsMet = getRequires(courseData).map(c => {
+                    if(isNaN(c)){
+                        return c.isCompleted;
+                    } else {
+                        return c <= creditSum;
+                    } 
+                });
+                
+                const course = document.getElementById(courseData.id)    
+                course.classList.remove('available');
+                course.classList.add('completed');
+                courses.forEach(course => {
+                    if (course.id === courseData.id) {
+                        course.isCompleted = true;                
+                    }});
+                createGrid();
+                } else {
+                    console.log(courseData.requires);
+            }}
+        })
+
+
+        
+        // aqui você pode criar a lógica para exibir as disciplinas na página
+        // por exemplo, inserir no #curriculum
+        
+        //const container = document.getElementById("curriculum");
+        //container.innerHTML = ""; // limpa conteúdo anterior
+        
+        /*data.forEach(d => {
+            const item = document.createElement("div");
+            item.textContent = `${d.codigo_disciplina} - CH: ${d.chs} - Tipo: ${d.tipo}`;
+            container.appendChild(item);
+        });*/
+    })
+    .catch((err) => console.error("Erro ao enviar PDF:", err));
+});
+
 const courseEventHandler = (course) => {
 
     const courseData = courses.find(c => course.id == c.id);
@@ -128,7 +186,7 @@ const courseEventHandler = (course) => {
                 return c.isCompleted;
             } else {
                 return c <= creditSum;
-            }
+            } 
         });
 
         if (isRequirementsMet.every(c => c)) {
