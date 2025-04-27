@@ -160,19 +160,6 @@ document.getElementById("fileInput").addEventListener("change", function () {
             }}
         })
 
-
-        
-        // aqui você pode criar a lógica para exibir as disciplinas na página
-        // por exemplo, inserir no #curriculum
-        
-        //const container = document.getElementById("curriculum");
-        //container.innerHTML = ""; // limpa conteúdo anterior
-        
-        /*data.forEach(d => {
-            const item = document.createElement("div");
-            item.textContent = `${d.codigo_disciplina} - CH: ${d.chs} - Tipo: ${d.tipo}`;
-            container.appendChild(item);
-        });*/
     })
     .catch((err) => console.error("Erro ao enviar PDF:", err));
 });
