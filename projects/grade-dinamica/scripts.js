@@ -5,6 +5,7 @@ const curriculumContainer = document.getElementById('curriculum');
 const selector = document.getElementById('course-select');
 const clearButton = document.getElementById('clear-button');
 var actualCourse = selector.value;
+var urlRequest = "https://grade-dinamica-backend-production.up.railway.app/upload"
 
 selector.addEventListener("change", () => {
     actualCourse = selector.value;
@@ -118,6 +119,51 @@ const createGrid = _ => {
 
 }
 
+document.getElementById("fileInput").addEventListener("change", function () {
+    const file = this.files[0];
+    if (!file) return;
+
+    const formData = new FormData();
+    formData.append("file", file);
+            
+    fetch(urlRequest, {
+        method: "POST",
+        body: formData
+    })
+    .then((res) => res.json())
+    .then((data) => {
+        console.log("Disciplinas extraídas:");
+        
+        
+        data.forEach((disciplina, index) => {
+            const courseData = courses.find(c => disciplina.codigo == c.id);    //Encontra o curso do arquivo interno a partir do historico
+            if(courseData != undefined){
+                if (!courseData.isCompleted) {
+                const isRequirementsMet = getRequires(courseData).map(c => {
+                    if(isNaN(c)){
+                        return c.isCompleted;
+                    } else {
+                        return c <= creditSum;
+                    } 
+                });
+                
+                const course = document.getElementById(courseData.id)    
+                course.classList.remove('available');
+                course.classList.add('completed');
+                courses.forEach(course => {
+                    if (course.id === courseData.id) {
+                        course.isCompleted = true;                
+                    }});
+                createGrid();
+                } else {
+                    console.log(courseData.requires);
+            }}
+        })
+
+    })
+    .catch((err) => console.error("Erro ao enviar PDF:", err));
+});
+
 const courseEventHandler = (course) => {
 
     const courseData = courses.find(c => course.id == c.id);
@@ -128,7 +174,7 @@ const courseEventHandler = (course) => {
                 return c.isCompleted;
             } else {
                 return c <= creditSum;
-            }
+            } 
         });
 
         if (isRequirementsMet.every(c => c)) {
