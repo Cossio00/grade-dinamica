@@ -5,6 +5,7 @@ const curriculumContainer = document.getElementById('curriculum');
 const selector = document.getElementById('course-select');
 const clearButton = document.getElementById('clear-button');
 var actualCourse = selector.value;
+var urlRequest = "https://grade-dinamica-backend-production.up.railway.app/upload"
 
 selector.addEventListener("change", () => {
     actualCourse = selector.value;
@@ -125,7 +126,7 @@ document.getElementById("fileInput").addEventListener("change", function () {
     const formData = new FormData();
     formData.append("file", file);
             
-    fetch("https://grade-dinamica-backend-production.up.railway.app/upload", {
+    fetch(urlRequest, {
         method: "POST",
         body: formData
     })
