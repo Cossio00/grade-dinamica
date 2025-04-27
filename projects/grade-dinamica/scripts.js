@@ -124,8 +124,8 @@ document.getElementById("fileInput").addEventListener("change", function () {
 
     const formData = new FormData();
     formData.append("file", file);
-
-    fetch("http://localhost:5000/upload", {
+            
+    fetch("https://grade-dinamica-backend-production.up.railway.app/upload", {
         method: "POST",
         body: formData
     })
