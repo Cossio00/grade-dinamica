@@ -125,27 +125,44 @@ document.getElementById("fileInput").addEventListener("change", function () {
 
     const formData = new FormData();
     formData.append("file", file);
-            
+    var electiveSum = 0
+    var optionalSum = 0
+
     fetch(urlRequest, {
         method: "POST",
         body: formData
     })
     .then((res) => res.json())
     .then((data) => {
-        console.log("Disciplinas extraídas:");
         
+        data.forEach((disciplina) => {
+            const courseData = courses.find(c => disciplina.codigo === c.id);
         
-        data.forEach((disciplina, index) => {
-            const courseData = courses.find(c => disciplina.codigo == c.id);    //Encontra o curso do arquivo interno a partir do historico
-            if(courseData != undefined){
+            if (courseData) {
                 if (!courseData.isCompleted) {
-                const isRequirementsMet = getRequires(courseData).map(c => {
-                    if(isNaN(c)){
-                        return c.isCompleted;
-                    } else {
-                        return c <= creditSum;
-                    } 
-                });
+                    const courseElement = document.getElementById(courseData.id);
+                    courseElement.classList.remove('available');
+                    courseElement.classList.add('completed');
+        
+                    courseData.isCompleted = true;  // Atualiza direto o objeto encontrado
+                    createGrid();
+                } else {
+                    console.log(courseData.requires);
+                }
+            } else {
+                const cargaHoraria = parseInt(disciplina.chs.split("/")[0], 10);
+                if (disciplina.tipo === 1) {
+                    electiveSum += cargaHoraria;
+                } else if (disciplina.tipo === 2) {
+                    optionalSum += cargaHoraria;
+                }
+            }
+        });
+        
+        /*data.forEach((disciplina, index) => {
+            const courseData = courses.find(c => disciplina.codigo == c.id);    //Encontra o curso do arquivo interno a partir do historico
+            if(courseData !== undefined){
+                if (!courseData.isCompleted) {
                 
                 const course = document.getElementById(courseData.id)    
                 course.classList.remove('available');
@@ -158,8 +175,60 @@ document.getElementById("fileInput").addEventListener("change", function () {
                 } else {
                     console.log(courseData.requires);
             }}
-        })
+            else{
+                if(disciplina.tipo == 1){
+                    electiveSum += parseInt(disciplina.chs.split("/")[0], 10);
+                }
+                else if (disciplina.tipo == 2){
+                    optionalSum += parseInt(disciplina.chs.split("/")[0], 10);
+                }
+            }
+        })*/
 
+        const electives = courses.filter(course =>
+            course.id.toLowerCase().startsWith('elt')
+        );
+
+        const optional = courses.filter(course =>
+            course.id.toLowerCase().startsWith('fct')
+        );
+
+        if (electiveSum > 0) {
+            electives.forEach(elective => {
+                if (elective.credits <= electiveSum) {
+                    const courseElement = document.getElementById(elective.id);
+                    courseElement.classList.remove('available');
+                    courseElement.classList.add('completed');
+        
+                    const courseIndex = courses.findIndex(c => c.id === elective.id);
+                    if (courseIndex !== -1) {
+                        courses[courseIndex].isCompleted = true;
+                    }
+        
+                    createGrid();
+                    electiveSum -= parseInt(elective.credits, 10);
+                }
+            });
+        }
+            
+
+        if (optionalSum > 0) {
+            optional.forEach(optional => {
+                if (optional.credits <= optionalSum) {
+                    const courseElement = document.getElementById(optional.id);
+                    courseElement.classList.remove('available');
+                    courseElement.classList.add('completed');
+        
+                    const courseIndex = courses.findIndex(c => c.id === optional.id);
+                    if (courseIndex !== -1) {
+                        courses[courseIndex].isCompleted = true;
+                    }
+        
+                    createGrid();
+                    optionalSum -= parseInt(optional.credits, 10);
+                }
+            });
+        }
     })
     .catch((err) => console.error("Erro ao enviar PDF:", err));
 });
